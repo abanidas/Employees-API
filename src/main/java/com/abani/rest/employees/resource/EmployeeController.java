@@ -71,17 +71,13 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/find/{id}")
-    public Employee getEmployeeById(@PathVariable(value = "id") Long employeeId){
-        Employee emp = null;
-        try {
-            emp = employeeService.findById(employeeId).get();
+    public ResponseEntity getEmployeeById(@PathVariable(value = "id") Long employeeId){
+        Employee emp = employeeService.findById(employeeId).orElse(null);
+        if(emp == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee details not found");
         }
-        catch (NoSuchElementException e) {
-            return new Employee();
-        }
-
         sendMail("Get Employee", "Emloyee Id " + emp.getId());
-        return emp;
+        return ResponseEntity.ok(emp);
     }
 
     @PostMapping("/add")
